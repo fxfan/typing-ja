@@ -58,18 +58,56 @@ KanaSequence.test = function(s) {
   return [seq.getDefaultRoman()].concat(seq.kanas.map(kana => kana.getDefaultRomanAfterThis()));
 };
 
+class KanaState extends dfa.State {
+  constructor(num, edges) {
+    super(num, edges);
+  }
+}
+
 class DFAPart {
 
-  constructor(firstEdge, states, lastEdge) {
-    this.firstEdge = firstEdge;
+  // statesのうち最後のstateに、次のDFAPartがつながる
+  constructor(firstEdges, states) {
+    this.firstEdges = firstEdges;
     this.states = states;
-    this.lastStateNum = lastStateNum;
   }
 
   appendTo(dfa, stateNum) {
     const state = dfa.getStateByNum(stateNum);
-    state.edges.push(this.firstEdge);
+    state.edges = state.edges.concat(this.firstEdges);
     this.states.forEach(s => dfa.addState(s));
+  }
+
+  // 2つのDFAPartのマージした新しいDFAPartを返す
+  // エントリポイントとなるedgesは連結される
+  // 両DFAPartの最後のstateはひとつに統合される
+  merge(other) {
+
+    const firstEdges = this.firstEdges.concat(other.firstEdges);
+
+    // this.statesにother.statesをコピーする
+    // ただし、other.statesのうち、other.statesの最後のstateにつながるedgeは、
+    // this.statesの最後のstateにつながるようにdestを変更し、
+    // other.statesの最後のstateはどこからも遷移しないのでコピー対象外とする
+    const thisLast = this.states[this.states.length - 1];
+    const otherLast = other.states[other.states.length - 1];
+    const states = other.states.reduce((states, state)=> {
+      state.edges.forEach(e => {
+        if (e.dest === otherLast.num) {
+          e.dest = thisLast.num;
+        }
+      });
+      return state === otherLast ? states : states.concat(state);
+    }, this.states);
+
+    return new DFAPart(firstEdges, states);
+  }
+
+  // partsのうち最初のひとつをベースとし、すべてのDFAPartをマージする
+  static mergeAll(parts) {
+    parts = parts.slice();
+    const first = parts.shift();
+    return parts.reduce((base, part)=> base.merge(part), first);
   }
 
 }
@@ -79,32 +117,67 @@ class DFAPart {
 // 拗音はひとつのKanaオブジェクトとして扱う
 // また、「っ」と「ん」はそれぞれひとつのKanaオブジェクトとして扱う
 class Kana {
+
+  // Kanaオブジェクトごとに、生成するstateに固有の番号を割り当てる
+  // 256の倍数を採番の開始値とし、ひとつのKanaオブジェクトが256個の番号を利用可能とする
+  static nextStateNumOrigin() {
+    if (!this._stateNumOrigin) {
+      this._stateNumOrigin = 1;
+    }
+    return 256 * this._stateNumOrigin++;
+  }
+
   constructor(seq) {
     this.seq = seq;
-    this.state
+    this.stateNumOrigin = Kana.nextStateNumOrigin();
+    this.stateNum = this.stateNumOrigin;
   }
+
+  newState() {
+    return new KanaState(this.nextStateNum());
+  }
+
+  nextStateNum() {
+    return this.stateNum++;
+  }
+
   getDefaultRoman() {
     throw "unsupported operation";
   }
+
   getDefaultRomanAfterThis() {
     return this.seq.getDefaultRomanAfter(this);
+  }
+
+  getDFAPart() {
+    throw "getDFAPart() must be implemented by subclasses.";
   }
 }
 
 Kana.Single = class extends Kana {
+
   constructor(seq, ch) {
     super(seq);
     this.ch = ch;
     this.romans = Kana.mapping[ch];
   }
+
   getDefaultRoman() {
     return this.romans[0];
   }
-  getDFAState() {
-    // this.romans.map(roman => {
-    //   const edge = new Edge(new CharLabel(roman.charAt(0)));
-    // });
-    // const state = new dfa.State();
+
+  getDFAPart() {
+    const parts = this.romans.map(roman => {
+      const states = roman.split("").reduce((states, ch) => {
+        const prevState = states[states.length - 1];
+        const nextState = this.newState();
+        prevState.edges.push(new dfa.Edge(new dfa.CharLabel.Single(ch), nextState.num));
+        return states.concat(nextState)
+      }, [ this.newState() ]);
+      const first = states.shift();
+      return new DFAPart(first.edges, states);
+    });
+    return DFAPart.mergeAll(parts);
   }
 }
 
