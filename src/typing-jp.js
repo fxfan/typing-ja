@@ -3,6 +3,10 @@ const dfa = require("dfa.js");
 class KanaSequence {
 
   constructor(word) {
+
+    if (word === null || word === undefined) {
+      throw "Parameter 'word' is required";
+    }
     
     this.word = word;
 
