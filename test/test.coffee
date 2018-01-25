@@ -1,6 +1,6 @@
 chai = require 'chai'
 should = require 'should'
-typing = require '../src/typing-jp.js'
+typing = require '../src/typing-ja.js'
 
 assert = chai.assert
 Sentence = typing.Sentence

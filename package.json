@@ -1,8 +1,8 @@
 {
-  "name": "typing-jp",
+  "name": "typing-ja",
   "version": "0.9.0",
   "description": "",
-  "main": "typing-jp.js",
+  "main": "typing-ja.js",
   "scripts": {
     "build": "gulp build",
     "test": "mocha --use_strict --compilers coffee:coffeescript --require coffeescript/register -R spec"
