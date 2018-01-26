@@ -87,7 +87,36 @@ class Kana {
 
   getNFAFragment() {
     throw "getNFAFragment() must be implemented by subclasses.";
+  } 
+
+  static tails(text) {
+    const _tails = (text)=> {
+      switch (text.length) {
+        case 0: return [];
+        default: return [text].concat(_tails(text.slice(1)));
+      }
+    };
+    return _tails(text);
   }
+
+  static romanToFragment(roman) {
+
+    const seq = am.StateNumSequence.newSequence();
+    const last = new am.State(seq.next(), []).toAcceptable(roman);
+
+    const states = Kana.tails(roman).reduce((states, tail) => {
+      const edge = new am.Edge(new am.CharLabel.Single(tail.charAt(0)), last.num);
+      const state = new am.State(seq.next(), [edge], { "tail": tail });
+      if (states.length > 0) {
+        const prevState = states[states.length - 1];
+        states[states.length - 1] = prevState.changeEdgesDest(last.num, state.num);
+      }
+      return states.concat(state)
+    }, []);
+
+    return new am.Fragment(states.concat(last));
+  }
+
 }
 
 Kana.Single = class Kana_Single extends Kana {
