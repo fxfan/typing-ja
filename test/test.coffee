@@ -129,7 +129,7 @@ describe 'Kana.Double', ->
       assert.isTrue trans.move new am.CharInput 's'
       assert.isFalse trans.isAcceptable()
       assert.isTrue trans.move new am.CharInput 'i'
-      assert.isTrue trans.isAcceptable()
+      assert.isTrue trans.isAcceptable() # TODO should not be true
       assert.isTrue trans.move new am.CharInput 'l'
       assert.isFalse trans.isAcceptable()
       assert.isTrue trans.move new am.CharInput 'y'
@@ -140,7 +140,7 @@ describe 'Kana.Double', ->
       assert.isTrue trans.move new am.CharInput 's'
       assert.isFalse trans.isAcceptable()
       assert.isTrue trans.move new am.CharInput 'i'
-      assert.isTrue trans.isAcceptable()
+      assert.isTrue trans.isAcceptable() # TODO should not be true
       assert.isTrue trans.move new am.CharInput 'x'
       assert.isFalse trans.isAcceptable()
       assert.isTrue trans.move new am.CharInput 'y'
@@ -153,7 +153,7 @@ describe 'Kana.Double', ->
       assert.isTrue trans.move new am.CharInput 'h'
       assert.isFalse trans.isAcceptable()
       assert.isTrue trans.move new am.CharInput 'i'
-      assert.isTrue trans.isAcceptable()
+      assert.isTrue trans.isAcceptable() # TODO should not be true
       assert.isTrue trans.move new am.CharInput 'l'
       assert.isFalse trans.isAcceptable()
       assert.isTrue trans.move new am.CharInput 'y'
