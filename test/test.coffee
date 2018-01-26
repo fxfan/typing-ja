@@ -31,6 +31,7 @@ describe 'Sentence', ->
       done()
 
 describe 'Kana.Single', ->
+  seq = am.StateNumSequence.newSequence()
   sentence = new Sentence 'ウホィ'
   u = sentence.kanas[0]
   ho = sentence.kanas[1]
@@ -52,7 +53,6 @@ describe 'Kana.Single', ->
       assert.strictEqual states[1].attrs['tail'], 'ya'
       assert.strictEqual states[2].attrs['tail'], 'a'
       assert.isTrue states[3].isAcceptable()
-      seq = am.StateNumSequence.newSequence()
       nfa = new am.NFA()
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment frag, nfa.start.num
@@ -79,3 +79,87 @@ describe 'Kana.Single', ->
       assert.strictEqual u.romans[1], 'wu'
       assert.strictEqual u.romans[2], 'whu'
       done()
+  describe 'getNFAFragment()', ->
+    it 'should generate a fragement which can accept the inputs corresponding each romans', (done)->
+      nfa = new am.NFA()
+      nfa.addStartState new am.State seq.next(), []
+      nfa.appendFragment u.getNFAFragment(), nfa.start.num
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'w'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'w'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'h'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      done()
+
+describe 'Kana.Double', ->
+  seq = am.StateNumSequence.newSequence()
+  sentence = new Sentence 'シャチョサン'
+  sya = sentence.kanas[0]
+  cyo = sentence.kanas[1]
+  describe 'getNFAFragment()', ->
+    it 'should generate a fragement which can accept the inputs corresponding each romans', (done)->
+      nfa = new am.NFA()
+      nfa.addStartState new am.State seq.next(), []
+      nfa.appendFragment sya.getNFAFragment(), nfa.start.num
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 's'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'y'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 's'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'h'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 's'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'i'
+      assert.isTrue trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'y'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 's'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'i'
+      assert.isTrue trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'y'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 's'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'h'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'i'
+      assert.isTrue trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'y'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.isAcceptable()
+      done()
+
+

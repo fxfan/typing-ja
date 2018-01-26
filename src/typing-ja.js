@@ -133,7 +133,7 @@ Kana.Single = class Kana_Single extends Kana {
   }
 
   getNFAFragment() {
-    const frags = this.romans.map(roman => new Regex(roman).toFragment());
+    const frags = this.romans.map(roman => Kana.romanToFragment(roman));
     return Fragment.mergeAll(frags);
   }
 }
@@ -152,13 +152,13 @@ Kana.Double = class Kana_Double extends Kana {
 
   getNFAFragment() {
     // this.romansそれぞれについてFragmentを生成
-    const frags1 = this.romans.map(roman => new Regex(roman).toFragment());
+    const frags1 = this.romans.map(roman => Kana.romanToFragment(roman));
 
     // chsを2文字に分割し、
     //  1文字目のromansに対応するFragmentリストを作る
     //  そのそれぞれについて、2文字目のromansをマージしてできたFragmentを連結したFragmentを生成
-    const second = Fragment.mergeAll(Kana.mapping[chs[1]].map(roman => new Regex(roman).toFragment()));
-    const frags2 = Kana.mapping[chs[0]].map(roman => new Regex(roman).toFragment().concat(second));
+    const second = Fragment.mergeAll(Kana.mapping[this.chs[1]].map(roman => Kana.romanToFragment(roman)));
+    const frags2 = Kana.mapping[this.chs[0]].map(roman => Kana.romanToFragment(roman).concat(second));
 
     return Fragment.mergeAll(frags1.concat(frags2));
   }
