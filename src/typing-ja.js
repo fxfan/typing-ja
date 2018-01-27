@@ -184,6 +184,17 @@ Kana.Ltu = class Kana_Ltu extends Kana {
     }
     return this.romans[0];
   }
+
+  getNFAFragment() {
+    const frags = [];
+    if (this.prev) {
+      const c = this.prev.getDefaultRoman().charAt(0);
+      if (!"aiueon".includes(c)) {
+        frags.push(Kana.romanToFragment(c));
+      }
+    }
+    return Fragment.mergeAll(frags.concat(this.romans.map(roman => Kana.romanToFragment(roman))));
+  }
 }
 
 Kana.N = class Kana_N extends Kana {

@@ -6,6 +6,7 @@ am = require 'dfa.js'
 assert = chai.assert
 Sentence = typing.Sentence
 Kana = typing.Kana
+seq = am.StateNumSequence.newSequence()
 
 describe 'Sentence', ->
   describe 'constructor(text)', ->
@@ -31,7 +32,6 @@ describe 'Sentence', ->
       done()
 
 describe 'Kana.Single', ->
-  seq = am.StateNumSequence.newSequence()
   sentence = new Sentence 'ウホィ'
   u = sentence.kanas[0]
   ho = sentence.kanas[1]
@@ -102,7 +102,6 @@ describe 'Kana.Single', ->
       done()
 
 describe 'Kana.Double', ->
-  seq = am.StateNumSequence.newSequence()
   sentence = new Sentence 'シャチョサン'
   sya = sentence.kanas[0]
   cyo = sentence.kanas[1]
@@ -159,6 +158,133 @@ describe 'Kana.Double', ->
       assert.isTrue trans.move new am.CharInput 'y'
       assert.isFalse trans.isAcceptable()
       assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.isAcceptable()
+      done()
+
+describe 'Kana.Ltu', ->
+  sentence = new Sentence 'アッ'
+  ltu1 = sentence.kanas[1]
+  sentence = new Sentence 'アッアッ'
+  ltu2 = sentence.kanas[1]
+  sentence = new Sentence 'モップ'
+  ltu3 = sentence.kanas[1]
+  describe 'getNFAFragment() for ッ without trailing letters', ->
+    it 'should generate a fragement which accepts "ltu","xtu","ltsu","xtsu"', (done)->
+      nfa = new am.NFA()
+      nfa.addStartState new am.State seq.next(), []
+      nfa.appendFragment ltu1.getNFAFragment(), nfa.start.num
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 's'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 's'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      done()
+  describe 'getNFAFragment() for ッ with trailing letter "a"', ->
+    it 'should generate a fragement which accepts "ltu","xtu","ltsu","xtsu"', (done)->
+      nfa = new am.NFA()
+      nfa.addStartState new am.State seq.next(), []
+      nfa.appendFragment ltu2.getNFAFragment(), nfa.start.num
+      trans = nfa.startNewTransition()
+      assert.isFalse trans.move new am.CharInput 'a'
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 's'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 's'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      done()
+  describe 'getNFAFragment() for ッ with trailing letter "p"', ->
+    it 'should generate a fragement which accepts "p","ltu","xtu","ltsu","xtsu"', (done)->
+      nfa = new am.NFA()
+      nfa.addStartState new am.State seq.next(), []
+      nfa.appendFragment ltu3.getNFAFragment(), nfa.start.num
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'p'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 's'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 't'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 's'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'u'
       assert.isTrue trans.isAcceptable()
       done()
 
