@@ -6,6 +6,7 @@ am = require 'dfa.js'
 assert = chai.assert
 Sentence = typing.Sentence
 Kana = typing.Kana
+CharInput = am.CharInput
 seq = am.StateNumSequence.newSequence()
 
 describe 'Sentence', ->
@@ -30,6 +31,44 @@ describe 'Sentence', ->
       assert.strictEqual sentence.kanas[6].getDefaultRoman(), 'n'
       assert.strictEqual sentence.kanas[7].getDefaultRoman(), 'ko'
       done()
+  describe 'getDFA()', ->
+    it 'should xxx', (done)->
+      sentence = new Sentence 'ニャンコ'
+      dfa = sentence.getDFA()
+      trans = dfa.startNewTransition()
+      assert.isTrue trans.move new CharInput 'n'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'y'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'a'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'n'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'k'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'o'
+      assert.isTrue trans.isAcceptable()
+      trans = dfa.startNewTransition()
+      assert.isTrue trans.move new CharInput 'n'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'i'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'l'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'y'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'a'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'n'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'n'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'c'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new CharInput 'o'
+      assert.isTrue trans.isAcceptable()
+      done()
+
 
 describe 'Kana.Single', ->
   sentence = new Sentence 'ウホィ'
@@ -57,11 +96,11 @@ describe 'Kana.Single', ->
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment frag, nfa.start.num
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.move new CharInput 'n'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'y'
+      assert.isTrue trans.move new CharInput 'y'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.move new CharInput 'a'
       assert.isTrue trans.isAcceptable()
       done()
   describe 'getDefaultRoman()', ->
@@ -85,19 +124,19 @@ describe 'Kana.Single', ->
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment u.getNFAFragment(), nfa.start.num
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'w'
+      assert.isTrue trans.move new CharInput 'w'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'w'
+      assert.isTrue trans.move new CharInput 'w'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'h'
+      assert.isTrue trans.move new CharInput 'h'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       done()
 
@@ -111,53 +150,53 @@ describe 'Kana.Double', ->
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment sya.getNFAFragment(), nfa.start.num
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 's'
+      assert.isTrue trans.move new CharInput 's'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'y'
+      assert.isTrue trans.move new CharInput 'y'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.move new CharInput 'a'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 's'
+      assert.isTrue trans.move new CharInput 's'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'h'
+      assert.isTrue trans.move new CharInput 'h'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.move new CharInput 'a'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 's'
+      assert.isTrue trans.move new CharInput 's'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'i'
+      assert.isTrue trans.move new CharInput 'i'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isTrue trans.move new CharInput 'l'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'y'
+      assert.isTrue trans.move new CharInput 'y'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.move new CharInput 'a'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 's'
+      assert.isTrue trans.move new CharInput 's'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'i'
+      assert.isTrue trans.move new CharInput 'i'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isTrue trans.move new CharInput 'x'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'y'
+      assert.isTrue trans.move new CharInput 'y'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.move new CharInput 'a'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 's'
+      assert.isTrue trans.move new CharInput 's'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'h'
+      assert.isTrue trans.move new CharInput 'h'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'i'
+      assert.isTrue trans.move new CharInput 'i'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isTrue trans.move new CharInput 'l'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'y'
+      assert.isTrue trans.move new CharInput 'y'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'a'
+      assert.isTrue trans.move new CharInput 'a'
       assert.isTrue trans.isAcceptable()
       done()
 
@@ -174,36 +213,36 @@ describe 'Kana.Ltu', ->
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment ltu1.getNFAFragment(), nfa.start.num
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isTrue trans.move new CharInput 'l'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isTrue trans.move new CharInput 'x'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isTrue trans.move new CharInput 'l'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 's'
+      assert.isTrue trans.move new CharInput 's'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isTrue trans.move new CharInput 'x'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 's'
+      assert.isTrue trans.move new CharInput 's'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       done()
   describe 'getNFAFragment() for ッ with trailing letter "a"', ->
@@ -212,38 +251,38 @@ describe 'Kana.Ltu', ->
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment ltu2.getNFAFragment(), nfa.start.num
       trans = nfa.startNewTransition()
-      assert.isFalse trans.move new am.CharInput 'a'
+      assert.isFalse trans.move new CharInput 'a'
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isTrue trans.move new CharInput 'l'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isTrue trans.move new CharInput 'x'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isTrue trans.move new CharInput 'l'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 's'
+      assert.isTrue trans.move new CharInput 's'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isTrue trans.move new CharInput 'x'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 's'
+      assert.isTrue trans.move new CharInput 's'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       done()
   describe 'getNFAFragment() for ッ with trailing letter "p"', ->
@@ -252,39 +291,39 @@ describe 'Kana.Ltu', ->
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment ltu3.getNFAFragment(), nfa.start.num
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'p'
+      assert.isTrue trans.move new CharInput 'p'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isTrue trans.move new CharInput 'l'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isTrue trans.move new CharInput 'x'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'l'
+      assert.isTrue trans.move new CharInput 'l'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 's'
+      assert.isTrue trans.move new CharInput 's'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'x'
+      assert.isTrue trans.move new CharInput 'x'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 't'
+      assert.isTrue trans.move new CharInput 't'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 's'
+      assert.isTrue trans.move new CharInput 's'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'u'
+      assert.isTrue trans.move new CharInput 'u'
       assert.isTrue trans.isAcceptable()
       done()
 
@@ -306,9 +345,9 @@ describe 'Kana.N', ->
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment n1.getNFAFragment(), nfa.start.num
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.move new CharInput 'n'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.move new CharInput 'n'
       assert.isTrue trans.isAcceptable()
       done()
   describe 'getNFAFragment() for ッ with trailing "aiueony"', ->
@@ -317,25 +356,25 @@ describe 'Kana.N', ->
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment n2.getNFAFragment(), nfa.start.num
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.move new CharInput 'n'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.move new CharInput 'n'
       assert.isTrue trans.isAcceptable()
       nfa = new am.NFA()
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment n3.getNFAFragment(), nfa.start.num
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.move new CharInput 'n'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.move new CharInput 'n'
       assert.isTrue trans.isAcceptable()
       nfa = new am.NFA()
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment n4.getNFAFragment(), nfa.start.num
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.move new CharInput 'n'
       assert.isFalse trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.move new CharInput 'n'
       assert.isTrue trans.isAcceptable()
       done()
   describe 'getNFAFragment() for ッ with trailing none-"n"', ->
@@ -344,8 +383,8 @@ describe 'Kana.N', ->
       nfa.addStartState new am.State seq.next(), []
       nfa.appendFragment n5.getNFAFragment(), nfa.start.num
       trans = nfa.startNewTransition()
-      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.move new CharInput 'n'
       assert.isTrue trans.isAcceptable()
-      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.move new CharInput 'n'
       assert.isTrue trans.isAcceptable()
       done()

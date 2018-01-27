@@ -1,7 +1,9 @@
 const am = require("dfa.js");
 
+const StateNumSequence = am.StateNumSequence
+const State = am.State
 const Fragment = am.Fragment
-const Regex = am.Regex
+const NFA = am.NFA
 
 class Sentence {
 
@@ -59,6 +61,16 @@ class Sentence {
       return s + kana.getDefaultRoman();
     }, "");
   }
+
+  getDFA() {
+    const frag = Fragment.concatAll(this.kanas.map(kana => kana.getNFAFragment()))
+      .toUnacceptable()
+      .toLastAcceptable();
+    const nfa = new NFA();
+    nfa.addStartState(new State(StateNumSequence.newSequence().next(), []));
+    nfa.appendFragment(frag, nfa.start.num);
+    return nfa.toDFA();
+  }
 }
 
 Sentence.test = function(s) {
@@ -101,12 +113,12 @@ class Kana {
 
   static romanToFragment(roman) {
 
-    const seq = am.StateNumSequence.newSequence();
-    const last = new am.State(seq.next(), []).toAcceptable(roman);
+    const seq = StateNumSequence.newSequence();
+    const last = new State(seq.next(), []).toAcceptable(roman);
 
     const states = Kana.tails(roman).reduce((states, tail) => {
       const edge = new am.Edge(new am.CharLabel.Single(tail.charAt(0)), last.num);
-      const state = new am.State(seq.next(), [edge], { "tail": tail });
+      const state = new State(seq.next(), [edge], { "tail": tail });
       if (states.length > 0) {
         const prevState = states[states.length - 1];
         states[states.length - 1] = prevState.changeEdgesDest(last.num, state.num);
@@ -114,7 +126,7 @@ class Kana {
       return states.concat(state)
     }, []);
 
-    return new am.Fragment(states.concat(last));
+    return new Fragment(states.concat(last));
   }
 
 }
