@@ -160,7 +160,9 @@ Kana.Double = class Kana_Double extends Kana {
     const second = Fragment.mergeAll(Kana.mapping[this.chs[1]].map(roman => Kana.romanToFragment(roman)));
     const frags2 = Kana.mapping[this.chs[0]].map(roman => Kana.romanToFragment(roman).concat(second));
 
-    return Fragment.mergeAll(frags1.concat(frags2));
+    return Fragment.mergeAll(frags1.concat(frags2))
+      .toUnacceptable()
+      .toLastAcceptable();
   }
 
 }
