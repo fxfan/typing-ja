@@ -289,3 +289,63 @@ describe 'Kana.Ltu', ->
       done()
 
 
+describe 'Kana.N', ->
+  sentence = new Sentence 'ピョン'
+  n1 = sentence.kanas[1]
+  sentence = new Sentence 'フンヌー'
+  n2 = sentence.kanas[1]
+  sentence = new Sentence 'ンン'
+  n3 = sentence.kanas[0]
+  sentence = new Sentence 'ンアッー'
+  n4 = sentence.kanas[0]
+  sentence = new Sentence 'フンガー'
+  n5 = sentence.kanas[1]
+  describe 'getNFAFragment() for ッ without trailing letters', ->
+    it 'should generate a fragement which just accepts "nn"', (done)->
+      nfa = new am.NFA()
+      nfa.addStartState new am.State seq.next(), []
+      nfa.appendFragment n1.getNFAFragment(), nfa.start.num
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.isAcceptable()
+      done()
+  describe 'getNFAFragment() for ッ with trailing "aiueony"', ->
+    it 'should generate a fragement which just accepts "nn"', (done)->
+      nfa = new am.NFA()
+      nfa.addStartState new am.State seq.next(), []
+      nfa.appendFragment n2.getNFAFragment(), nfa.start.num
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.isAcceptable()
+      nfa = new am.NFA()
+      nfa.addStartState new am.State seq.next(), []
+      nfa.appendFragment n3.getNFAFragment(), nfa.start.num
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.isAcceptable()
+      nfa = new am.NFA()
+      nfa.addStartState new am.State seq.next(), []
+      nfa.appendFragment n4.getNFAFragment(), nfa.start.num
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isFalse trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.isAcceptable()
+      done()
+  describe 'getNFAFragment() for ッ with trailing none-"n"', ->
+    it 'should generate a fragement which accepts "n","nn"', (done)->
+      nfa = new am.NFA()
+      nfa.addStartState new am.State seq.next(), []
+      nfa.appendFragment n5.getNFAFragment(), nfa.start.num
+      trans = nfa.startNewTransition()
+      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.isAcceptable()
+      assert.isTrue trans.move new am.CharInput 'n'
+      assert.isTrue trans.isAcceptable()
+      done()

@@ -212,6 +212,11 @@ Kana.N = class Kana_N extends Kana {
   }
 
   getNFAFragment() {
+    if (this.allowSingleN) {
+      return Fragment.mergeAll(["n", "nn"].map(roman => Kana.romanToFragment(roman)));
+    } else {
+      return Kana.romanToFragment("nn");
+    }
   }
 }
 
