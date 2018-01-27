@@ -39,6 +39,6 @@
     "should": "^13.2.1"
   },
   "dependencies": {
-    "dfa.js": "^1.4.2"
+    "dfa.js": "^1.5.0"
   }
 }
