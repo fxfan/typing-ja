@@ -12,7 +12,7 @@ notify = require 'gulp-notify'
 gulp.task 'build', (done)->
   gulp.src 'src/typing-ja.js'
     .pipe babel({presets:['env']})
-    .pipe uglify()
+    .pipe uglify({ keep_fnames: true })
     .pipe gulp.dest('.')
 
 gulp.task 'build-example', (done)->
