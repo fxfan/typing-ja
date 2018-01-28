@@ -12,23 +12,32 @@ var newChallenge = function () {
 }();
 
 var showChallenge = function () {
+  var $correct = document.getElementById("correct");
+  var $mistype = document.getElementById("mistype");
   var $kana = document.getElementById("kana");
   var $roman = document.getElementById("roman");
-  return function (cha) {
-    $kana.innerHTML = cha.text;
-    $roman.innerHTML = "<span class=\"typed\">" + cha.typedRoman + "</span\"><span class=\"remaining\">" + cha.remainingRoman + "</span>";
+  return function () {
+    $correct.innerHTML = typingCount;
+    $mistype.innerHTML = mistypingCount;
+    $kana.innerHTML = challenge.text;
+    $roman.innerHTML = "<span class=\"typed\">" + challenge.typedRoman + "</span\"><span class=\"remaining\">" + challenge.remainingRoman + "</span>";
   };
 }();
 
 var challenge = newChallenge();
-showChallenge(challenge);
+var typingCount = 0;
+var mistypingCount = 0;
+
+showChallenge();
 
 addEventListener("keydown", function (e) {
   challenge.input(e.key);
   if (challenge.isCleared()) {
+    typingCount += challenge.typingCount;
+    mistypingCount += challenge.mistypingCount;
     challenge = newChallenge();
   }
-  showChallenge(challenge);
+  showChallenge();
 });
 
 },{"../../src/typing-ja":3}],2:[function(require,module,exports){

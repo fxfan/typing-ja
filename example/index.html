@@ -3,6 +3,10 @@
 <meta charset="utf-8">
 <title>しんぷるたいぴんぐ</title>
 <style>
+#correct, #mistype {
+  font-family: Menlo, Consolas, monospace;
+  font-weight: bold;
+}
 #roman {
   font-family: Menlo, Consolas, monospace;
   font-weight: bold;
@@ -15,6 +19,7 @@
 }
 </style>
 
+<p id="count">正しいタイプ数: <span id="correct"></span>, ミスタイプ数: <span id="mistype"></span></p>
 <p id="kana"></p>
 <p id="roman"></p>
 
