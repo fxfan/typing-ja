@@ -1,17 +1,25 @@
 {
   "name": "typing-ja",
   "version": "0.9.0",
-  "description": "",
+  "description": "JavaScript library for supporting Japanese typing software development.",
   "main": "typing-ja.js",
   "scripts": {
     "build": "gulp build",
     "test": "mocha --use_strict --compilers coffee:coffeescript --require coffeescript/register -R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fxfan/typing-ja.git"
   },
   "author": {
     "name": "fxfan",
     "email": "fanban.xiaofan@gmail.com"
   },
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fxfan/typing-ja/issues"
+  },
+  "homepage": "https://github.com/fxfan/typing-ja#readme",
   "babel": {
     "presets": [
       [
