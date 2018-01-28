@@ -184,7 +184,8 @@ Kana.Ltu = class Kana_Ltu extends Kana {
   constructor(sentence, prev) {
     super(sentence);
     this.prev = prev;
-    this.romans = ["ltu", "xtu", "ltsu", "xtsu"];
+    this.romans = Object.freeze(["ltu", "xtu", "ltsu", "xtsu"]);
+    return Object.freeze(this);
   }
 
   // 「っ」は、後ろにカナが続き、かつそれがア行でもナ行でもない場合、後ろのカナのローマ字の子音先頭ひと文字を重ねる
@@ -217,6 +218,7 @@ Kana.N = class Kana_N extends Kana {
     super(sentence);
     this.prev = prev;
     this.allowSingleN = prev && !"aiueony".includes(prev.getDefaultRoman().charAt(0));
+    return Object.freeze(this);
   }
 
   // 「ん」は、後ろにカナが続き、かつそれがア行でもナ行でもヤ行でもない場合、nひとつでも許される
