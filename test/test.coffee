@@ -69,6 +69,89 @@ describe 'Sentence', ->
       assert.isTrue trans.isAcceptable()
       done()
 
+describe 'Challenge', ->
+  sentence = new Sentence 'ニャンコ'
+  challenge = sentence.newChallenge()
+  describe 'constructor(sentence)', ->
+    it 'should has proper initial properties', (done)->
+      assert.isFalse challenge.isCleared()
+      assert.strictEqual challenge.typedRoman, ''
+      assert.strictEqual challenge.remainingRoman, 'nyanko'
+      assert.strictEqual challenge.typingCount, 0
+      assert.strictEqual challenge.mistypingCount, 0
+      done()
+  describe 'input(key)', ->
+    it 'should accept a correct key input', (done)->
+      assert.isTrue challenge.input 'n'
+      done()
+    it 'should store typedRoman when a correct key is input', (done)->
+      assert.strictEqual challenge.typedRoman, 'n'
+      done()
+    it 'should prune remainingRoman when a correct key is input', (done)->
+      assert.strictEqual challenge.remainingRoman, 'yanko'
+      done()
+    it 'should increment typingCount when a correct key is input', (done)->
+      assert.strictEqual challenge.typingCount, 1
+      done()
+    it 'should not increment mistypingCount when a correct key is input', (done)->
+      assert.strictEqual challenge.mistypingCount, 0
+      done()
+    it 'should not be cleared when it needs more input', (done)->
+      assert.isFalse challenge.isCleared()
+      done()
+    it 'should not accept a wrong key input', (done)->
+      assert.isFalse challenge.input 'a'
+      done()
+    it 'should not store typedRoman when a wrong key is input', (done)->
+      assert.strictEqual challenge.typedRoman, 'n'
+      done()
+    it 'should not prune remainingRoman when a wrong key is input', (done)->
+      assert.strictEqual challenge.remainingRoman, 'yanko'
+      done()
+    it 'should not increment typingCount when a wrong key is input', (done)->
+      assert.strictEqual challenge.typingCount, 1
+      done()
+    it 'should increment mistypingCount when a wrong key is input', (done)->
+      assert.strictEqual challenge.mistypingCount, 1
+      done()
+    it 'should be cleared with correct input sequence', (done)->
+      assert.isTrue challenge.input 'y'
+      assert.strictEqual challenge.typedRoman, 'ny'
+      assert.strictEqual challenge.remainingRoman, 'anko'
+      assert.isTrue challenge.input 'a'
+      assert.strictEqual challenge.typedRoman, 'nya'
+      assert.strictEqual challenge.remainingRoman, 'nko'
+      assert.isTrue challenge.input 'n'
+      assert.strictEqual challenge.typedRoman, 'nyan'
+      assert.strictEqual challenge.remainingRoman, 'ko'
+      assert.isTrue challenge.input 'k'
+      assert.strictEqual challenge.typedRoman, 'nyank'
+      assert.strictEqual challenge.remainingRoman, 'o'
+      assert.isFalse challenge.isCleared()
+      assert.isTrue challenge.input 'o'
+      assert.strictEqual challenge.typedRoman, 'nyanko'
+      assert.strictEqual challenge.remainingRoman, ''
+      assert.isTrue challenge.isCleared()
+      done()
+    it 'should make remainingRoman change in response to alternative inputs', (done)->
+      challenge = sentence.newChallenge()
+      assert.isTrue challenge.input 'n'
+      assert.isTrue challenge.input 'i'
+      assert.strictEqual challenge.typedRoman, 'ni'
+      assert.strictEqual challenge.remainingRoman, 'lyanko'
+      assert.isTrue challenge.input 'x'
+      assert.strictEqual challenge.typedRoman, 'nix'
+      assert.strictEqual challenge.remainingRoman, 'yanko'
+      assert.isTrue challenge.input 'y'
+      assert.isTrue challenge.input 'a'
+      assert.strictEqual challenge.typedRoman, 'nixya'
+      assert.strictEqual challenge.remainingRoman, 'nko'
+      assert.isTrue challenge.input 'n'
+      assert.isTrue challenge.input 'n'
+      assert.strictEqual challenge.typedRoman, 'nixyann'
+      assert.strictEqual challenge.remainingRoman, 'ko'
+      done()
+
 
 describe 'Kana.Single', ->
   sentence = new Sentence 'ウホィ'
@@ -198,7 +281,15 @@ describe 'Kana.Double', ->
       assert.isFalse trans.isAcceptable()
       assert.isTrue trans.move new CharInput 'a'
       assert.isTrue trans.isAcceptable()
+      trans = nfa.startNewTransition()
+      assert.isFalse trans.move new CharInput 'h'
+      assert.isFalse trans.move new CharInput 'y'
+      assert.isFalse trans.move new CharInput 'a'
+      assert.isFalse trans.move new CharInput 'i'
+      assert.isFalse trans.move new CharInput 'l'
+      assert.isFalse trans.move new CharInput 'x'
       done()
+
 
 describe 'Kana.Ltu', ->
   sentence = new Sentence 'アッ'

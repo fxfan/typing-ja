@@ -1,9 +1,10 @@
 const am = require("dfa.js");
 
-const StateNumSequence = am.StateNumSequence
-const State = am.State
-const Fragment = am.Fragment
-const NFA = am.NFA
+const StateNumSequence = am.StateNumSequence;
+const State = am.State;
+const Fragment = am.Fragment;
+const NFA = am.NFA;
+const CharInput = am.CharInput;
 
 class Sentence {
 
@@ -47,6 +48,10 @@ class Sentence {
 
     this.kanas = Object.freeze(toKanaArray(text));
     return Object.freeze(this);
+  }
+
+  newChallenge() {
+    return new Challenge(this);
   }
 
   getDefaultRoman() {
@@ -122,7 +127,14 @@ class Kana {
 
   getNFAFragment() {
     throw "getNFAFragment() must be implemented by subclasses.";
-  } 
+  }
+
+  getDFA() {
+    const nfa = new NFA();
+    nfa.addStartState(new State(StateNumSequence.newSequence().next(), []));
+    nfa.appendFragment(this.getNFAFragment(), nfa.start.num);
+    return nfa.toDFA();
+  }
 
   static tails(text) {
     const _tails = (text)=> {
@@ -252,10 +264,102 @@ Kana.N = class Kana_N extends Kana {
 
   getNFAFragment() {
     if (this.allowSingleN) {
-      return Fragment.mergeAll(["n", "nn"].map(roman => Kana.romanToFragment(roman)));
+      return Fragment.mergeAll(["n", "nn"].map(roman => Kana.romanToFragment(roman)))
+        .toUnacceptable()
+        .toLastAcceptable();
     } else {
       return Kana.romanToFragment("nn");
     }
+  }
+}
+
+class Challenge {
+
+  constructor(sentence) {
+    this._sentence = sentence;
+    this._transitions = sentence.kanas.map(kana => kana.getDFA().startNewTransition());
+    this._pointer = 0;
+    this._typedRoman = [];
+    this._typingCount = 0;
+    this._mistypingCount = 0;
+  }
+
+  get text() {
+    return this._sentence.text;
+  }
+
+  get roman() {
+    return this._sentence.getDefaultRoman();
+  }
+
+  get typedRoman() {
+    return this._typedRoman.join("");
+  }
+
+  get remainingRoman() {
+    if (this.isCleared()) {
+      return "";
+    }
+    const tails = this._currentTransition.current.attrs["tail"];
+    return (!this._currentTransition.isAcceptable() && tails && tails.length > 0 ? tails[0] : "")
+      + this._sentence.getDefaultRomanAfter(this._currentKana);
+  }
+
+  get typingCount() {
+    return this._typingCount;
+  }
+
+  get mistypingCount() {
+    return this._mistypingCount;
+  }
+
+  input(key) {
+
+    if (this.isCleared()) {
+      throw "Challenge has been cleared";
+    }
+
+    // 「ん」がnでもnnでも受理可能な場合、
+    // nを受理した時点で「ん」のDFA遷移を終了させるわけにはいかず
+    // 「ん」の次のカナについて何かの入力を受理した時点ではじめて「ん」の遷移は終了として扱える
+    // 
+    // pointerが指しているtransitionについて
+    //  - 受理状態になってもまだpointerを進めることはしない
+    //  - 入力があったらpointerが指すtransitionが遷移可能か調べ、可能ならする
+    //  - transitionが受理状態かつ遷移不可である場合、pointer+1のtransitionで遷移を試みる
+    //  - それが成功なら、ここでpointerを進める
+    //  - 失敗なら、入力ミス
+    //  - transitionが受理状態かつ次のtransitionがない(最後のtransitionが受理状態である)場合、clearとなる
+
+    const input = new CharInput(key);
+
+    if (this._currentTransition.move(input)) {
+      this._typedRoman.push(key);
+      this._typingCount++;
+      return true;
+    } else {
+      const next = this._transitions[this._pointer + 1];
+      if (this._currentTransition.isAcceptable() && next && next.move(input)) {
+        this._typedRoman.push(key);
+        this._typingCount++;
+        this._pointer++;
+        return true;
+      }
+      this._mistypingCount++;
+      return false;
+    }
+  }
+
+  isCleared() {
+    return this._transitions[this._transitions.length - 1].isAcceptable();
+  }
+
+  get _currentTransition() {
+    return this._transitions[this._pointer];
+  }
+
+  get _currentKana() {
+    return this._sentence.kanas[this._pointer];
   }
 }
 
@@ -464,4 +568,6 @@ Kana.mapping = Object.assign({}, Kana.DEFAULT_KANA_MAPPING);
 module.exports = {
   Sentence: Sentence,
   KanaIterator: KanaIterator,
+  Kana: Kana,
+  Challenge: Challenge
 };
