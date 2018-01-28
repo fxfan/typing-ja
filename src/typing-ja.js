@@ -62,6 +62,10 @@ class Sentence {
     }, "");
   }
 
+  getKanaIterator() {
+    return new KanaIterator(this);
+  }
+
   getDFA() {
     const frag = Fragment.concatAll(this.kanas.map(kana => kana.getNFAFragment()))
       .toUnacceptable()
@@ -70,6 +74,25 @@ class Sentence {
     nfa.addStartState(new State(StateNumSequence.newSequence().next(), []));
     nfa.appendFragment(frag, nfa.start.num);
     return nfa.toDFA();
+  }
+}
+
+class KanaIterator {
+
+  constructor(sentence) {
+    this._sentence = sentence;
+    this._index = 0;
+  }
+
+  next() {
+    if (!this.hasNext()) {
+      throw "No more kana in the sentence";
+    }
+    return this._sentence.kanas[this._index++];
+  }
+
+  hasNext() {
+    return this._index < this._sentence.kanas.length;
   }
 }
 
@@ -440,5 +463,5 @@ Kana.mapping = Object.assign({}, Kana.DEFAULT_KANA_MAPPING);
 
 module.exports = {
   Sentence: Sentence,
-  Kana: Kana
+  KanaIterator: KanaIterator,
 };
