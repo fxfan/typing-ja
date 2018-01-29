@@ -46,8 +46,6 @@ class Sentence {
       }
     };
 
-    console.log(text);
-    console.log(text.split("").map(c => Kana.normalize(c)).join(""));
     this.kanas = Object.freeze(toKanaArray(text.split("").map(c => Kana.normalize(c)).join("")));
     return Object.freeze(this);
   }
