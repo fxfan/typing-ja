@@ -4,7 +4,7 @@
 var typing = require("../../src/typing-ja");
 
 var newChallenge = function () {
-  var questions = ["マヨイマイマイ", "ナデコメドゥーサ", "ツバサキャット", "スルガモンキー", "コヨミヴァンプ", "シノブマスタード", "カレンオウガ", "ツキヒフェニックス", "ヒタギエンド", "デストピアデスエデュケーション"];
+  var questions = ["まよいマイマイ", "なでこメドゥーサ", "つばさキャット", "するがモンキー", "こよみヴァンプ", "しのぶマスタード", "かれんオウガ", "つきひフェニックス", "ひたぎエンド", "ですとぴあデスエデュケーション"];
   return function () {
     var q = questions[Math.floor(Math.random() * questions.length)];
     return new typing.Sentence(q).newChallenge();
@@ -112,7 +112,13 @@ var Sentence = function () {
       }
     };
 
-    this.kanas = Object.freeze(toKanaArray(text));
+    console.log(text);
+    console.log(text.split("").map(function (c) {
+      return Kana.normalize(c);
+    }).join(""));
+    this.kanas = Object.freeze(toKanaArray(text.split("").map(function (c) {
+      return Kana.normalize(c);
+    }).join("")));
     return Object.freeze(this);
   }
 
@@ -258,6 +264,12 @@ var Kana = function () {
       }, []);
 
       return new Fragment(states.concat(last));
+    }
+  }, {
+    key: "normalize",
+    value: function normalize(letter) {
+      var i = HIRAKANA.indexOf(letter);
+      return i >= 0 ? KATAKANA.charAt(i) : letter;
     }
   }]);
 
@@ -535,10 +547,11 @@ var Challenge = function () {
   return Challenge;
 }();
 
+var HIRAKANA = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽゔーぁぃぅぇぉゎゃゅょ";
+var KATAKANA = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポヴーァィゥェォヮャュョ";
+
 // http://gontyping.com/input-method/maniac.html を参考に
 // Google日本語入力で変換できないものは除外した
-
-
 Kana.DEFAULT_KANA_MAPPING = Object.freeze({
   "ア": ["a"],
   "イ": ["i"],

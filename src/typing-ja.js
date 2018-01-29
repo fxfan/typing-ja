@@ -46,7 +46,9 @@ class Sentence {
       }
     };
 
-    this.kanas = Object.freeze(toKanaArray(text));
+    console.log(text);
+    console.log(text.split("").map(c => Kana.normalize(c)).join(""));
+    this.kanas = Object.freeze(toKanaArray(text.split("").map(c => Kana.normalize(c)).join("")));
     return Object.freeze(this);
   }
 
@@ -162,6 +164,11 @@ class Kana {
     }, []);
 
     return new Fragment(states.concat(last));
+  }
+
+  static normalize(letter) {
+    const i = HIRAKANA.indexOf(letter);
+    return i >= 0 ? KATAKANA.charAt(i) : letter;
   }
 
 }
@@ -362,6 +369,9 @@ class Challenge {
     return this._sentence.kanas[this._pointer];
   }
 }
+
+const HIRAKANA = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽゔーぁぃぅぇぉゎゃゅょ";
+const KATAKANA = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポヴーァィゥェォヮャュョ";
 
 // http://gontyping.com/input-method/maniac.html を参考に
 // Google日本語入力で変換できないものは除外した

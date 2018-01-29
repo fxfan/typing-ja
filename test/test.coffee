@@ -31,6 +31,19 @@ describe 'Sentence', ->
       assert.strictEqual sentence.kanas[6].getDefaultRoman(), 'n'
       assert.strictEqual sentence.kanas[7].getDefaultRoman(), 'ko'
       done()
+    it 'should normalize Hirakana to Katakana', (done)->
+      sentence = new Sentence 'ニャッとなくニャンコ'
+      assert.strictEqual sentence.text, 'ニャッとなくニャンコ'
+      assert.strictEqual sentence.kanas.length, 8
+      assert.strictEqual sentence.kanas[0].getDefaultRoman(), 'nya'
+      assert.strictEqual sentence.kanas[1].getDefaultRoman(), 't'
+      assert.strictEqual sentence.kanas[2].getDefaultRoman(), 'to'
+      assert.strictEqual sentence.kanas[3].getDefaultRoman(), 'na'
+      assert.strictEqual sentence.kanas[4].getDefaultRoman(), 'ku'
+      assert.strictEqual sentence.kanas[5].getDefaultRoman(), 'nya'
+      assert.strictEqual sentence.kanas[6].getDefaultRoman(), 'n'
+      assert.strictEqual sentence.kanas[7].getDefaultRoman(), 'ko'
+      done()
   describe 'getDFA()', ->
     it 'should xxx', (done)->
       sentence = new Sentence 'ニャンコ'
